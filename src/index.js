@@ -1,15 +1,26 @@
 const express = require('express');
-const studentsRouter = require('./routes/students'); 
+const bodyParser = require('body-parser');
+
+const db = require('./utils/db');
+const studentsRouter = require('./routes/students');
 
 const app = express();
+const port = process.env.PORT || 3000;
+
+require('dotenv').config();
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('Student API');
   }
 );
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.use(bodyParser.json());
+app.use('/api/v1/students', studentsRouter);
+
+db.connect().then(() => {
+    app.listen(port);
+  }
+).catch(err => {
+    console.log(err);
   }
 );
-
