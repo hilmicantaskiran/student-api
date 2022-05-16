@@ -10,7 +10,7 @@ module.exports.getStudents = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.getStudent = asyncHandler(async (req, res, next) => {
-  const student = await studentsService.getByHashCode(req.params.hashCode);
+  const student = await studentsService.getByHashCode(req.params.studentID);
   res.status(200).json({
     success: true,
     data: student

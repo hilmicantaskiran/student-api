@@ -2,19 +2,18 @@ const Student = require('../models/students');
 const bycrypt = require('bcryptjs');
 
 module.exports.create = async (props) => {
-  let { name, surname, email, password, studentNumber } = props;
+  let { name, surname, email, password, studentNumber, studentID } = props;
 
   const salt = await bycrypt.genSalt(10);
   const hashedPassword = await bycrypt.hash(password, salt);
-  const hashCode = await bycrypt.hash(studentNumber, salt);
-
+  
   let student = new Student({
     name: name,
     surname: surname,
     email: email,
     password: hashedPassword,
     studentNumber: studentNumber,
-    hashCode: hashCode
+    studentID: studentID
   });
 
   await student.save();
@@ -26,8 +25,8 @@ module.exports.getAll = async () => {
   return students;
 };
 
-module.exports.getByHashCode = async (hashCode) => {
-  const student = await Student.findOne({ hashCode: hashCode });
+module.exports.getByID = async (studentID) => {
+  const student = await Student.findOne({ studentID: studentID });
   return student;
 };
 

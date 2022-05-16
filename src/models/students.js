@@ -23,7 +23,7 @@ const schema = new mongoose.Schema({
     unique: true,
     required: true
   },
-  hashCode: {
+  studentID: {
     type: String,
     unique: true,
     required: true
