@@ -3,12 +3,15 @@ const bycrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 module.exports.create = async (props) => {
-  let { email, studentNumber, password } = props;
+  let { name_surname, faculty, department, email, studentNumber, password } = props;
 
   const salt = await bycrypt.genSaltSync(10);
   const hashedPassword = await bycrypt.hashSync(password, salt);
 
   let user = new User({
+    name_surname: name_surname,
+    faculty: faculty,
+    department: department,
     email: email,
     studentNumber: studentNumber,
     password: hashedPassword,
@@ -17,28 +20,48 @@ module.exports.create = async (props) => {
   await user.save();
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-  return token;
+  return {
+    data: user,
+    token: token,
+  }
 };
 
-module.exports.getAll = async () => {
-  const users = await User.find();
-  return users;
+module.exports.getAll = async (props) => {
+  if (props.email) {
+    const user = await User.findOne({ email: props.email });
+    return user;
+  } else {
+    const users = await User.find();
+    return users;
+  }
 };
 
-module.exports.getByEmail = async (email) => {
-  await User.findOne({ email: email }).then((user) => {
-    const isValid = bycrypt.compareSync(password, user.password);
-    if (isValid) {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      return {
-        accessToken: token,
-      };
+module.exports.getByEmail = async (props) => {
+  let { email } = props;
+
+  const user = await User.findOne({ email: email });
+  return user;
+};
+
+module.exports.login = async (props) => {
+  let { email, password } = props;
+
+  let user = await User.findOne({ email: email });
+  let isValid = bycrypt.compareSync(password, user.password);
+
+  if (isValid) {
+    let token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    return {
+      data: user,
+      token: token,
     }
-  });
+  } else {
+    return null;
+  }
 };
 
-module.exports.update = async (email, props) => {
-  let { studentNumber, password } = props;
+module.exports.update = async (props) => {
+  let { name_surname, faculty, department, email, studentNumber, password } = props;
 
   const salt = await bycrypt.genSaltSync(10);
   const hashedPassword = await bycrypt.hashSync(password, salt);
@@ -46,6 +69,9 @@ module.exports.update = async (email, props) => {
   let user = await User.findOneAndUpdate(
     { email: email },
     {
+      name_surname: name_surname,
+      faculty: faculty,
+      department: department,
       email: email,
       studentNumber: studentNumber,
       password: hashedPassword,
@@ -55,7 +81,8 @@ module.exports.update = async (email, props) => {
   return user;
 };
 
-module.exports.delete = async (email) => {
+module.exports.delete = async (props) => {
+  const { email } = props;
   const user = await User.findOneAndDelete({ email: email });
   return user;
 };
