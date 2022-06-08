@@ -3,13 +3,13 @@ const bycrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 module.exports.create = async (props) => {
-  let { name_surname, faculty, department, email, studentNumber, password } = props;
+  let { nameSurname, faculty, department, email, studentNumber, password } = props;
 
   const salt = await bycrypt.genSaltSync(10);
   const hashedPassword = await bycrypt.hashSync(password, salt);
 
   let user = new User({
-    name_surname: name_surname,
+    nameSurname: nameSurname,
     faculty: faculty,
     department: department,
     email: email,
@@ -61,7 +61,7 @@ module.exports.login = async (props) => {
 };
 
 module.exports.update = async (props) => {
-  let { name_surname, faculty, department, email, studentNumber, password } = props;
+  let { nameSurname, faculty, department, email, studentNumber, password } = props;
 
   const salt = await bycrypt.genSaltSync(10);
   const hashedPassword = await bycrypt.hashSync(password, salt);
@@ -69,7 +69,7 @@ module.exports.update = async (props) => {
   let user = await User.findOneAndUpdate(
     { email: email },
     {
-      name_surname: name_surname,
+      nameSurname: nameSurname,
       faculty: faculty,
       department: department,
       email: email,
